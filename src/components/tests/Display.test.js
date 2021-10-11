@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 
 import Display from './../Display';
 import fetchShow from '../../api/fetchShow';
+jest.mock("../../api/fetchShow");
 
 const testShow = {
     //add in approprate test data structure here.
@@ -13,48 +14,53 @@ const testShow = {
     {
         id: 1,
         name: 'a good one',
-        episodes: ['episode 1', 'episode 2', 'episode 3'],
+        episodes: [],
     },
     {
         id: 2,
         name: 'a bad one',
-        episodes: ['episode 1', 'episode 2', 'episode 3'],
+        episodes: [],
     },
     {
         id: 1,
         name: 'a sad one',
-        episodes: ['episode 1', 'episode 2', 'episode 3'],
+        episodes: [],
     },
 ]
 }
 
-test('renders without errors', () => {
+test("render Display without any props", () => {
     render(<Display />);
-});
-
-test('Test that when the fetch button is pressed, the show component will display', async () => {
+  });
+  
+  test("when the fetch button is pressed, the show component will display", async () => {
+    fetchShow.mockResolvedValueOnce(testShow);
     render(<Display />);
-    const button = screen.queryByRole('button');
+    const button = screen.getByRole("button");
     userEvent.click(button);
-
-    await waitFor (() => {
-        const show = screen.queryAllByTestId('show-container');
-        expect(show).toBeTruthy();
+    const show = await screen.findByTestId("show-container");
+    expect(show).toBeInTheDocument();
+  });
+  
+  test("when the fetch button is pressed, the amount of select options rendered is equal to the amount of seasons in your test data", async () => {
+    fetchShow.mockResolvedValueOnce(testShow);
+    render(<Display />);
+    const button = screen.getByRole("button");
+    userEvent.click(button);
+    const options = await screen.findByRole("combobox");
+    expect(options).toHaveLength(4);
+  });
+  
+  test("test when fetch button is pressed, function called", async () => {
+    const displayFunction = jest.fn();
+    fetchShow.mockResolvedValueOnce(testShow);
+    render(<Display displayFunc={displayFunction} />);
+    const button = screen.getByRole("button");
+    userEvent.click(button);
+    await waitFor(() => {
+      expect(displayFunction).toBeCalledTimes(1);
     });
-
-});
-
-test('Test that when the fetch button is pressed, the amount of select options rendered is equal to the amount of seasons in your test data', async () => {
-    jest.mock('../../api/fetchShow');
-    render(<Display />);
-    const button = screen.queryByRole('button');
-    userEvent.click(button);
-
-});
-
-test('Test that when the fetch button is pressed, this function is called', () => {
-    render(<Display />);
-});
+  });
 
 
 ///Tasks:
