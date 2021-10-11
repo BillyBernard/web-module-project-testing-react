@@ -1,16 +1,60 @@
+import React from 'react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
+import Display from './../Display';
+import fetchShow from '../../api/fetchShow';
 
+const testShow = {
+    //add in approprate test data structure here.
+    name:'Will the wise',
+    summary: 'he is a wizard',
+    seasons: [
+    {
+        id: 1,
+        name: 'a good one',
+        episodes: ['episode 1', 'episode 2', 'episode 3'],
+    },
+    {
+        id: 2,
+        name: 'a bad one',
+        episodes: ['episode 1', 'episode 2', 'episode 3'],
+    },
+    {
+        id: 1,
+        name: 'a sad one',
+        episodes: ['episode 1', 'episode 2', 'episode 3'],
+    },
+]
+}
 
+test('renders without errors', () => {
+    render(<Display />);
+});
 
+test('Test that when the fetch button is pressed, the show component will display', async () => {
+    render(<Display />);
+    const button = screen.queryByRole('button');
+    userEvent.click(button);
 
+    await waitFor (() => {
+        const show = screen.queryAllByTestId('show-container');
+        expect(show).toBeTruthy();
+    });
 
+});
 
+test('Test that when the fetch button is pressed, the amount of select options rendered is equal to the amount of seasons in your test data', async () => {
+    jest.mock('../../api/fetchShow');
+    render(<Display />);
+    const button = screen.queryByRole('button');
+    userEvent.click(button);
 
+});
 
-
-
-
-
+test('Test that when the fetch button is pressed, this function is called', () => {
+    render(<Display />);
+});
 
 
 ///Tasks:
