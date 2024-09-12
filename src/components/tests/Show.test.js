@@ -6,21 +6,67 @@ import Show from './../Show';
 
 const testShow = {
     //add in approprate test data structure here.
+    name:'Will the wise',
+    summary: 'he is a wizard',
+    seasons: [
+    {
+        id: 1,
+        name: 'a good one',
+        episodes: [],
+    },
+    {
+        id: 2,
+        name: 'a bad one',
+        episodes: [],
+    },
+    {
+        id: 1,
+        name: 'a sad one',
+        episodes: [],
+    },
+]
 }
 
 test('renders testShow and no selected Season without errors', ()=>{
+    render(<Show show = {testShow} selectedSeason = {'none'} />);
 });
 
 test('renders Loading component when prop show is null', () => {
+    render(<Show show = {null} />);
+
+    const loading = screen.queryByTestId(/loading-container/i);
+    expect(loading).toBeInTheDocument();
 });
 
 test('renders same number of options seasons are passed in', ()=>{
+    render(<Show show = {testShow} selectedSeason = {'none'}/>);
+
+    const { seasons } = testShow;
+
+    expect(seasons).toHaveLength(3);
 });
 
 test('handleSelect is called when an season is selected', () => {
+    const getSeasonMock = jest.fn()
+    render(<Show show = {testShow} selectedSeason = {'none'} handleSelect = {getSeasonMock}/>);
+//     const seasonOptions = screen.getByRole('combobox');
+//     userEvent.selectOptions(seasonOptions, [3]);
+//     expect(seasonOptions).toBeInTheDocument();
+
+userEvent.selectOptions(screen.getByRole('combobox'), ['2', '3']);
+
+expect(getSeasonMock).toBeCalledTimes(1);
 });
 
 test('component renders when no seasons are selected and when rerenders with a season passed in', () => {
+    const { rerender } = render(<Show show = {testShow} selectedSeason = {'none'} />);
+    let episodes = screen.queryByTestId(/episodes-container/i);
+    expect(episodes).not.toBeInTheDocument();
+
+    rerender(<Show show = {testShow} selectedSeason = {[2]}/>);
+    episodes = screen.queryByTestId(/episodes-container/i);
+    expect(episodes).toBeInTheDocument();
+
 });
 
 //Tasks:
